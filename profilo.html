@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Area personale — 3ª D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     VARIABILI GLOBALI — identiche a index.html, per mantenere
+     coerenza visiva perfetta tra le due pagine.
+     ========================================================= */
+  :root {
+    --bg-0: #050506;
+    --ink-0: #f5f5f7;
+    --ink-1: rgba(245,245,247,0.62);
+    --ink-2: rgba(245,245,247,0.38);
+    --hair: rgba(255,255,255,0.10);
+    --hair-strong: rgba(255,255,255,0.16);
+    --glass-fill: linear-gradient(155deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
+    --glass-fill-soft: linear-gradient(155deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+    --accent: #8fb8ff;
+    --accent-soft: rgba(143,184,255,0.16);
+    --shadow-ambient: 0 20px 60px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(ellipse 60% 45% at 18% 8%, rgba(110,140,210,0.10), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 85% 18%, rgba(150,110,200,0.07), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 50% 100%, rgba(70,90,150,0.09), transparent 60%),
+      var(--bg-0);
+    min-height: 100vh;
+    width: 100%;
+    color: var(--ink-0);
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Macchie di luce sfumate sullo sfondo: stesso effetto
+     ambientale della homepage, per continuità visiva. */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-a {
+    width: 520px; height: 520px;
+    top: -140px; left: -120px;
+    background: radial-gradient(circle, rgba(120,150,230,0.16), transparent 70%);
+    animation: drift-a 26s ease-in-out infinite alternate;
+  }
+  .blob-b {
+    width: 480px; height: 480px;
+    bottom: -160px; right: -100px;
+    background: radial-gradient(circle, rgba(170,130,210,0.13), transparent 70%);
+    animation: drift-b 30s ease-in-out infinite alternate;
+  }
+  @keyframes drift-a {
+    from { transform: translate(0,0); }
+    to   { transform: translate(60px, 40px); }
+  }
+  @keyframes drift-b {
+    from { transform: translate(0,0); }
+    to   { transform: translate(-50px, -30px); }
+  }
+
+  /* Comparsa morbida dell'intero contenuto al caricamento
+     della pagina — l'unico momento di ingresso animato. */
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* -------------------- topbar -------------------- */
+  .topbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 28px 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .topbar strong { color: var(--ink-1); font-weight: 600; }
+  .topbar .right { text-align: right; }
+
+  /* -------------------- hero personale -------------------- */
+  .hero {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 56px 24px 32px;
+    animation: rise-in 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* Avatar circolare con l'iniziale dello studente, stessa
+     identità visiva della piccola icona nel pulsante homepage
+     ma qui ingrandita come elemento protagonista. */
+  .avatar-big {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #eaf1ff;
+    background: var(--glass-fill);
+    border: 1px solid var(--hair-strong);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.2);
+    margin-bottom: 26px;
+  }
+
+  .hero-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    font-size: clamp(2.1rem, 5.6vw, 3.6rem);
+    line-height: 1.08;
+    margin: 0;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.82) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-subtitle {
+    margin: 16px 0 36px;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: var(--ink-1);
+    letter-spacing: 0.01em;
+  }
+
+  /* Pulsante secondario "cambia utente": stesso family del
+     pulsante principale della home, ma più discreto (outline). */
+  .ghost-btn {
+    appearance: none;
+    border: 1px solid var(--hair-strong);
+    background: rgba(255,255,255,0.04);
+    color: var(--ink-1);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 11px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease;
+  }
+  .ghost-btn:hover {
+    background: rgba(255,255,255,0.09);
+    color: var(--ink-0);
+    border-color: var(--hair-strong);
+    transform: translateY(-1px);
+  }
+  .ghost-btn:active { transform: translateY(0); }
+  .ghost-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* -------------------- sezione "in arrivo" -------------------- */
+  .upcoming {
+    position: relative;
+    z-index: 2;
+    padding: 12px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: rise-in 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    animation-delay: 0.08s;
+  }
+
+  .upcoming-inner { width: 100%; max-width: 920px; }
+
+  .upcoming-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+    margin: 0 0 6px;
+    color: var(--ink-0);
+  }
+
+  .upcoming-caption {
+    margin: 0 0 22px;
+    font-size: 0.88rem;
+    color: var(--ink-2);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  /* Card "in arrivo": stesso linguaggio glass delle altre
+     superfici, ma con opacità ridotta e cursore disabilitato
+     per comunicare chiaramente che la funzione non è attiva. */
+  .feature-card {
+    position: relative;
+    background: var(--glass-fill-soft);
+    border: 1px solid var(--hair);
+    border-radius: 22px;
+    padding: 22px;
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.08);
+    cursor: not-allowed;
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease;
+    text-align: left;
+  }
+  .feature-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--hair-strong);
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--hair);
+    margin-bottom: 14px;
+    color: var(--ink-1);
+  }
+
+  .feature-name {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--ink-0);
+    margin: 0 0 4px;
+  }
+
+  .feature-desc {
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    margin: 0 0 14px;
+    line-height: 1.45;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--ink-1);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--hair);
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+
+  /* -------------------- footer -------------------- */
+  .footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 10px 24px 30px;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.28);
+  }
+
+  @media (max-width: 640px) {
+    .topbar { flex-direction: column; gap: 10px; padding: 22px 20px 0; }
+    .topbar .right { text-align: left; }
+    .hero { padding: 44px 18px 28px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .upcoming { padding: 8px 16px 32px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob-a, .blob-b { animation: none; }
+    .hero, .upcoming { animation: none; }
+    .ghost-btn, .feature-card { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="blob blob-a" aria-hidden="true"></div>
+  <div class="blob blob-b" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div>
+      Scuola Secondaria di Primo Grado<br />
+      <strong>Giuseppe Mazzini</strong>
+    </div>
+    <div class="right">
+      Noventa di Piave<br />
+      <strong>3ª D</strong>
+    </div>
+  </header>
+
+  <main class="hero">
+    <div class="avatar-big" id="avatarBig">?</div>
+    <h1 class="hero-title" id="heroTitle">Ciao</h1>
+    <p class="hero-subtitle">questa è la tua area personale</p>
+
+    <a class="ghost-btn" href="./index.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Cambia utente
+    </a>
+  </main>
+
+  <section class="upcoming">
+    <div class="upcoming-inner">
+      <h2 class="upcoming-title">In arrivo</h2>
+      <p class="upcoming-caption">Queste funzioni saranno attivate nelle prossime versioni.</p>
+
+      <div class="card-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <p class="feature-name">Calendario eventi</p>
+          <p class="feature-desc">Uscite, riunioni e scadenze della classe in un unico calendario condiviso.</p>
+          <span class="feature-tag">Presto disponibile</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+          </div>
+          <p class="feature-name">Verifiche e interrogazioni</p>
+          <p class="feature-desc">Il calendario di verifiche e interrogazioni, sempre aggiornato.</p>
+          <span class="feature-tag">Presto disponibile</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+          </div>
+          <p class="feature-name">Materiali e upload</p>
+          <p class="feature-desc">Condivisione di file, appunti e documenti della classe.</p>
+          <span class="feature-tag">Presto disponibile</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+          </div>
+          <p class="feature-name">Accesso personale</p>
+          <p class="feature-desc">Login e area riservata con le tue impostazioni personali.</p>
+          <span class="feature-tag">Presto disponibile</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">Designed by Giuseppe</footer>
+
+<script>
+  /* -----------------------------------------------------------------------
+     Deve corrispondere esattamente all'elenco usato in index.html,
+     così la pagina personale valida il nome ricevuto dall'URL e non
+     mostra un profilo per un nome inventato o scritto a mano.
+     ----------------------------------------------------------------------- */
+  const STUDENTI = [
+    "Alessandra", "Anastasia", "Anna", "Dajana", "Damiano", "Edoardo",
+    "Elenoire", "Enriko", "Giuseppe", "Hargun", "Khadija", "Mia",
+    "Nicolò", "Patric", "Pietro", "Sofia", "Tommaso", "Vitalina",
+  ];
+
+  // Legge il parametro ?nome= dall'URL (es. profilo.html?nome=Sofia).
+  const params = new URLSearchParams(window.location.search);
+  const nomeRicevuto = params.get("nome");
+
+  // Confronto case-insensitive, per sicurezza: se il nome nell'URL
+  // non corrisponde a nessuno studente della classe, si torna alla home.
+  const nomeValido = STUDENTI.find(
+    (n) => n.toLowerCase() === (nomeRicevuto || "").toLowerCase()
+  );
+
+  if (!nomeValido) {
+    window.location.replace("./index.html");
+  } else {
+    document.getElementById("heroTitle").textContent = "Ciao, " + nomeValido;
+    document.getElementById("avatarBig").textContent = nomeValido.charAt(0);
+    document.title = nomeValido + " — 3ª D";
+  }
+</script>
+
+</body>
+</html>
