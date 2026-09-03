@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3ª D — Giuseppe Mazzini</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     VARIABILI GLOBALI — palette colori, trasparenze, ombre.
+     Modifica qui per cambiare i toni in tutta la pagina.
+     ========================================================= */
+  :root {
+    --bg-0: #050506;
+    --ink-0: #f5f5f7;
+    --ink-1: rgba(245,245,247,0.62);
+    --ink-2: rgba(245,245,247,0.38);
+    --hair: rgba(255,255,255,0.10);
+    --hair-strong: rgba(255,255,255,0.16);
+    --glass-fill: linear-gradient(155deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
+    --glass-fill-soft: linear-gradient(155deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+    --accent: #8fb8ff;
+    --accent-soft: rgba(143,184,255,0.16);
+    --shadow-ambient: 0 20px 60px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(ellipse 60% 45% at 18% 8%, rgba(110,140,210,0.10), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 85% 18%, rgba(150,110,200,0.07), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 50% 100%, rgba(70,90,150,0.09), transparent 60%),
+      var(--bg-0);
+    min-height: 100vh;
+    width: 100%;
+    color: var(--ink-0);
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Macchie di luce sfumate sullo sfondo: unico movimento
+     "ambientale" della pagina, lento e discreto. */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-a {
+    width: 520px; height: 520px;
+    top: -140px; left: -120px;
+    background: radial-gradient(circle, rgba(120,150,230,0.16), transparent 70%);
+    animation: drift-a 26s ease-in-out infinite alternate;
+  }
+  .blob-b {
+    width: 480px; height: 480px;
+    bottom: -160px; right: -100px;
+    background: radial-gradient(circle, rgba(170,130,210,0.13), transparent 70%);
+    animation: drift-b 30s ease-in-out infinite alternate;
+  }
+  @keyframes drift-a {
+    from { transform: translate(0,0); }
+    to   { transform: translate(60px, 40px); }
+  }
+  @keyframes drift-b {
+    from { transform: translate(0,0); }
+    to   { transform: translate(-50px, -30px); }
+  }
+
+  /* -------------------- topbar -------------------- */
+  .topbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 28px 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .topbar strong { color: var(--ink-1); font-weight: 600; }
+  .topbar .right { text-align: right; }
+
+  /* -------------------- hero -------------------- */
+  .hero {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 64px 24px 48px;
+    min-height: 62vh;
+  }
+
+  .hero-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    font-size: clamp(2.35rem, 6.4vw, 4.6rem);
+    line-height: 1.05;
+    margin: 0;
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.82) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-subtitle {
+    margin: 18px 0 44px;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(0.98rem, 1.6vw, 1.2rem);
+    color: var(--ink-1);
+    letter-spacing: 0.01em;
+  }
+
+  .picker {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Pulsante "Seleziona chi sei": effetto vetro, con stati
+     data-open (menu aperto) e data-selected (utente scelto). */
+  .cta {
+    position: relative;
+    appearance: none;
+    border: 1px solid var(--hair-strong);
+    background: var(--glass-fill);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    color: var(--ink-0);
+    font-family: inherit;
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    padding: 18px 30px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.25);
+    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, background 0.35s ease;
+  }
+  .cta:hover {
+    transform: translateY(-2px) scale(1.015);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
+  .cta:active { transform: translateY(0px) scale(0.98); }
+  .cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .cta .chev {
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+    opacity: 0.75;
+    display: inline-flex;
+  }
+  .cta[data-open="true"] .chev { transform: rotate(180deg); }
+
+  .cta[data-selected="true"] {
+    background: linear-gradient(155deg, rgba(143,184,255,0.16), rgba(143,184,255,0.04));
+    border-color: rgba(143,184,255,0.32);
+  }
+  .cta .avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(143,184,255,0.22);
+    color: #dfe9ff;
+    flex-shrink: 0;
+  }
+
+  /* -------------------- dropdown -------------------- */
+  /* Menu a tendina con la lista studenti. A differenza di una
+     tendina "flottante", qui il menu occupa spazio reale nel
+     flusso della pagina: quando si apre, spinge fisicamente
+     verso il basso l'orario e il footer, invece di sovrapporsi
+     ai contenuti sottostanti.
+
+     La tecnica usa una griglia con grid-template-rows che passa
+     da "0fr" (altezza zero) a "1fr" (altezza naturale): il
+     browser interpola questo valore in modo fluido, ottenendo
+     un'apertura morbida in stile Apple senza dover calcolare
+     altezze in pixel via JavaScript. */
+  .dropdown {
+    display: grid;
+    grid-template-rows: 0fr;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    transition: grid-template-rows 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .dropdown[data-open="true"] {
+    grid-template-rows: 1fr;
+  }
+
+  /* Il figlio diretto della griglia deve avere overflow nascosto
+     e min-height:0, altrimenti il contenuto interno impedirebbe
+     alla riga di animarsi fino a zero. */
+  .dropdown-clip {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .dropdown-panel {
+    margin-top: 14px;
+    background: linear-gradient(160deg, rgba(28,28,32,0.94), rgba(14,14,16,0.92));
+    backdrop-filter: blur(48px) saturate(190%);
+    -webkit-backdrop-filter: blur(48px) saturate(190%);
+    border: 1px solid var(--hair-strong);
+    border-radius: 28px;
+    padding: 18px;
+    box-shadow: 0 30px 90px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.14);
+    opacity: 0;
+    transform: scale(0.94) translateY(-10px);
+    transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .dropdown[data-open="true"] .dropdown-panel {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  .dropdown-label {
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    padding: 6px 10px 14px;
+    text-align: left;
+  }
+
+  .student-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .student-grid::-webkit-scrollbar { width: 6px; }
+  .student-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 10px; }
+
+  .student-pill {
+    appearance: none;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.045);
+    color: var(--ink-1);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 12px 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease, color 0.22s ease;
+  }
+  .student-pill:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: var(--hair);
+    color: var(--ink-0);
+    transform: translateY(-1px);
+  }
+  .student-pill[data-active="true"] {
+    background: var(--accent-soft);
+    border-color: rgba(143,184,255,0.4);
+    color: #eaf1ff;
+  }
+  .student-pill svg { flex-shrink: 0; opacity: 0.9; }
+
+  /* -------------------- accesso con codice personale -------------------- */
+  /* Overlay a schermo intero che compare dopo la scelta del nome:
+     sfondo scurito e sfocato (come un "foglio" Apple), con al centro
+     una card di vetro che chiede il codice personale dello studente. */
+  .access-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(4,4,5,0.55);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .access-overlay[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .access-card {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(160deg, rgba(28,28,32,0.94), rgba(14,14,16,0.92));
+    border: 1px solid var(--hair-strong);
+    border-radius: 30px;
+    padding: 36px 30px 30px;
+    backdrop-filter: blur(48px) saturate(190%);
+    -webkit-backdrop-filter: blur(48px) saturate(190%);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.14);
+    text-align: center;
+    transform: scale(0.92) translateY(14px);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
+  }
+  .access-overlay[data-open="true"] .access-card {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .access-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #eaf1ff;
+    background: var(--glass-fill);
+    border: 1px solid var(--hair-strong);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  .access-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.4rem;
+    margin: 0 0 6px;
+    color: var(--ink-0);
+  }
+
+  .access-subtitle {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.92rem;
+    color: var(--ink-1);
+    margin: 0 0 26px;
+  }
+
+  .access-input {
+    width: 100%;
+    appearance: none;
+    border: 1px solid var(--hair-strong);
+    background: rgba(255,255,255,0.045);
+    color: var(--ink-0);
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-align: center;
+    padding: 14px 12px;
+    border-radius: 16px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .access-input::placeholder {
+    color: var(--ink-2);
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .access-input:focus {
+    border-color: rgba(143,184,255,0.5);
+    box-shadow: 0 0 0 4px rgba(143,184,255,0.12);
+  }
+
+  .access-error {
+    min-height: 18px;
+    margin: 12px 0 4px;
+    font-size: 0.82rem;
+    color: rgba(255,138,138,0.9);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .access-error[data-show="true"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .access-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .access-submit {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .access-cancel {
+    background: none;
+    border: none;
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+    padding: 6px;
+    transition: color 0.25s ease;
+  }
+  .access-cancel:hover { color: var(--ink-1); }
+  .access-cancel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Animazione di errore: piccola scossa orizzontale, come lo
+     sblocco fallito su iOS. */
+  @keyframes shake-x {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+  .access-card.shake { animation: shake-x 0.5s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+
+  /* -------------------- orario -------------------- */
+  /* Sezione "Orario scolastico": tabella in stile Apple,
+     con colonna "Ora" fissa durante lo scroll orizzontale
+     su schermi stretti. */
+  .schedule {
+    position: relative;
+    z-index: 2;
+    padding: 20px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .schedule-inner { width: 100%; max-width: 920px; }
+
+  .schedule-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+    margin: 0 0 18px;
+    color: var(--ink-0);
+  }
+
+  .table-frame {
+    background: var(--glass-fill-soft);
+    backdrop-filter: blur(26px) saturate(160%);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    border: 1px solid var(--hair);
+    border-radius: 24px;
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.10);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  table.timetable { border-collapse: collapse; width: 100%; min-width: 620px; }
+
+  .timetable thead th {
+    position: sticky;
+    top: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink-1);
+    text-align: left;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--hair);
+    background: rgba(255,255,255,0.03);
+    white-space: nowrap;
+  }
+  .timetable thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: rgba(18,18,20,0.92);
+  }
+
+  .timetable tbody td {
+    padding: 15px 18px;
+    font-size: 0.88rem;
+    color: var(--ink-1);
+    border-bottom: 1px solid rgba(255,255,255,0.055);
+    white-space: nowrap;
+  }
+  .timetable tbody tr:last-child td { border-bottom: none; }
+  .timetable tbody tr:hover td { color: var(--ink-0); background: rgba(255,255,255,0.025); }
+
+  .timetable tbody td:first-child,
+  .timetable thead th:first-child { font-weight: 600; color: var(--ink-0); }
+  .timetable tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: rgba(14,14,16,0.9);
+    backdrop-filter: blur(10px);
+  }
+
+  /* -------------------- footer -------------------- */
+  .footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 10px 24px 30px;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.28);
+  }
+
+  @media (max-width: 640px) {
+    .topbar { flex-direction: column; gap: 10px; padding: 22px 20px 0; }
+    .topbar .right { text-align: left; }
+    .hero { padding: 48px 18px 36px; min-height: 56vh; }
+    .student-grid { grid-template-columns: repeat(2, 1fr); max-height: 300px; }
+    .schedule { padding: 12px 16px 32px; }
+    .dropdown-panel { padding: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob-a, .blob-b { animation: none; }
+    .cta, .dropdown, .student-pill { transition: none; }
+    .access-overlay, .access-card, .access-input, .access-error { transition: none; }
+    .access-card.shake { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="blob blob-a" aria-hidden="true"></div>
+  <div class="blob blob-b" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div>
+      Scuola Secondaria di Primo Grado<br />
+      <strong>Giuseppe Mazzini</strong>
+    </div>
+    <div class="right">
+      Noventa di Piave<br />
+      <strong>3ª D</strong>
+    </div>
+  </header>
+
+  <main class="hero">
+    <h1 class="hero-title">Benvenuti nella 3ª D</h1>
+    <p class="hero-subtitle">chi sei?</p>
+
+    <div class="picker" id="picker">
+      <button
+        type="button"
+        class="cta"
+        id="ctaButton"
+        data-open="false"
+        data-selected="false"
+        aria-expanded="false"
+        aria-haspopup="listbox"
+      >
+        <span id="ctaLabel">Seleziona chi sei</span>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+
+      <div class="dropdown" id="dropdown" data-open="false">
+        <div class="dropdown-clip">
+          <div class="dropdown-panel" role="listbox">
+            <p class="dropdown-label">Studenti · 3ª D</p>
+            <div class="student-grid" id="studentGrid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="schedule">
+    <div class="schedule-inner">
+      <h2 class="schedule-title">Orario scolastico</h2>
+      <div class="table-frame">
+        <table class="timetable" id="timetable">
+          <thead>
+            <tr id="timetableHead"></tr>
+          </thead>
+          <tbody id="timetableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Schermata "codice personale": compare dopo la scelta del nome.
+       Resta nascosta (data-open="false") finché il JavaScript non la apre. -->
+  <div class="access-overlay" id="accessOverlay" data-open="false">
+    <div class="access-card" id="accessCard">
+      <div class="access-avatar" id="accessAvatar">?</div>
+      <h2 class="access-title" id="accessTitle">Ciao</h2>
+      <p class="access-subtitle">inserisci il tuo codice personale</p>
+
+      <form id="accessForm" autocomplete="off" novalidate>
+        <input
+          type="password"
+          inputmode="numeric"
+          class="access-input"
+          id="accessInput"
+          placeholder="Codice"
+          maxlength="8"
+          autocomplete="off"
+        />
+        <p class="access-error" id="accessError" data-show="false">Codice non corretto. Riprova.</p>
+
+        <div class="access-actions">
+          <button type="submit" class="cta access-submit">Entra</button>
+          <button type="button" class="access-cancel" id="accessCancel">Annulla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">Designed by Giuseppe</footer>
+
+<script>
+  /* -----------------------------------------------------------------------
+     DATI SEGNAPOSTO — modificabili liberamente
+     ----------------------------------------------------------------------- */
+
+  const STUDENTI = [
+    "Alessandra", "Anastasia", "Anna", "Dajana", "Damiano", "Edoardo",
+    "Elenoire", "Enriko", "Giuseppe", "Hargun", "Khadija", "Mia",
+    "Nicolò", "Patric", "Pietro", "Sofia", "Tommaso", "Vitalina",
+  ];
+
+  const GIORNI = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì"];
+
+  /* -----------------------------------------------------------------------
+     CODICI DI ACCESSO — un codice personale per ciascuno studente.
+     Modifica pure questi valori quando vuoi: è l'UNICO punto del file
+     da cambiare per aggiornare i codici.
+
+     ATTENZIONE: questo non è un vero sistema di login. Non c'è un
+     server, un database né una password nascosta: chiunque apra il
+     codice sorgente della pagina (anche solo con "visualizza sorgente"
+     nel browser) può vedere questi codici. È pensato solo come un
+     filtro semplice e informale per la classe, non come una misura di
+     sicurezza reale.
+     ----------------------------------------------------------------------- */
+  const CODICI_ACCESSO = {
+    "Alessandra": "1001",
+    "Anastasia": "1002",
+    "Anna": "1003",
+    "Dajana": "1004",
+    "Damiano": "1005",
+    "Edoardo": "1006",
+    "Elenoire": "1007",
+    "Enriko": "1008",
+    "Giuseppe": "1009",
+    "Hargun": "1010",
+    "Khadija": "1011",
+    "Mia": "1012",
+    "Nicolò": "1013",
+    "Patric": "1014",
+    "Pietro": "1015",
+    "Sofia": "1016",
+    "Tommaso": "1017",
+    "Vitalina": "1018",
+  };
+
+  // Ogni riga: { ora, materie: [Lun, Mar, Mer, Gio, Ven] }
+  const ORARIO = [
+    { ora: "1ª ora", materie: ["Italiano", "Matematica", "Inglese", "Storia", "Scienze"] },
+    { ora: "2ª ora", materie: ["Italiano", "Matematica", "Tecnologia", "Storia", "Arte"] },
+    { ora: "3ª ora", materie: ["Geografia", "Scienze", "Inglese", "Musica", "Matematica"] },
+    { ora: "4ª ora", materie: ["Matematica", "Francese", "Ed. Fisica", "Italiano", "Religione"] },
+    { ora: "5ª ora", materie: ["Ed. Fisica", "Italiano", "Arte", "Matematica", "Italiano"] },
+    { ora: "6ª ora", materie: ["Musica", "Storia", "Geografia", "Scienze", "Francese"] },
+  ];
+
+  /* -------------------------------------------------------------------------
+     STATO
+     ------------------------------------------------------------------------- */
+
+  let open = false;
+  let selected = null;
+  let pendingStudent = null;
+
+  const picker = document.getElementById("picker");
+  const ctaButton = document.getElementById("ctaButton");
+  const ctaLabel = document.getElementById("ctaLabel");
+  const dropdown = document.getElementById("dropdown");
+  const studentGrid = document.getElementById("studentGrid");
+
+  const accessOverlay = document.getElementById("accessOverlay");
+  const accessCard = document.getElementById("accessCard");
+  const accessAvatar = document.getElementById("accessAvatar");
+  const accessTitle = document.getElementById("accessTitle");
+  const accessForm = document.getElementById("accessForm");
+  const accessInput = document.getElementById("accessInput");
+  const accessError = document.getElementById("accessError");
+  const accessCancel = document.getElementById("accessCancel");
+
+  const checkIconSVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+  /* -------------------------------------------------------------------------
+     RENDER: MENU STUDENTI
+     ------------------------------------------------------------------------- */
+
+  // Disegna (o ridisegna) la griglia dei 18 studenti dentro il menu.
+  // Viene richiamata ogni volta che cambia lo studente selezionato,
+  // così il segno di spunta si sposta sulla scelta corretta.
+  function renderStudents() {
+    studentGrid.innerHTML = "";
+    STUDENTI.forEach((nome) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "student-pill";
+      btn.setAttribute("role", "option");
+      btn.setAttribute("data-active", String(selected === nome));
+      btn.setAttribute("aria-selected", String(selected === nome));
+      btn.innerHTML = nome + (selected === nome ? checkIconSVG : "");
+      btn.addEventListener("click", () => selectStudent(nome));
+      studentGrid.appendChild(btn);
+    });
+  }
+
+  // Chiamata al click su un nome: salva la selezione, aggiorna la
+  // grafica del pulsante, chiude il menu e — dopo una breve pausa
+  // per mostrare la spunta — apre la schermata che chiede il codice
+  // personale dello studente scelto.
+  function selectStudent(nome) {
+    selected = nome;
+    renderStudents();
+    updateButton();
+    setOpen(false);
+    window.setTimeout(() => openAccessScreen(nome), 380);
+  }
+
+  // Aggiorna il testo/aspetto del pulsante principale in base
+  // al fatto che sia stato scelto o meno uno studente.
+  function updateButton() {
+    ctaButton.setAttribute("data-selected", String(Boolean(selected)));
+    if (selected) {
+      ctaLabel.innerHTML = `<span class="avatar">${selected.charAt(0)}</span>${selected}`;
+    } else {
+      ctaLabel.textContent = "Seleziona chi sei";
+    }
+  }
+
+  // Apre/chiude il menu a tendina impostando gli attributi data-*
+  // che il CSS usa per animare comparsa/scomparsa e ruotare la freccia.
+  function setOpen(next) {
+    open = next;
+    ctaButton.setAttribute("data-open", String(open));
+    ctaButton.setAttribute("aria-expanded", String(open));
+    dropdown.setAttribute("data-open", String(open));
+  }
+
+  // Click sul pulsante: apre se chiuso, chiude se aperto.
+  ctaButton.addEventListener("click", () => setOpen(!open));
+
+  // Click fuori dal menu -> chiude automaticamente.
+  document.addEventListener("mousedown", (e) => {
+    if (open && !picker.contains(e.target)) setOpen(false);
+  });
+  // Tasto Esc -> chiude il menu (accessibilità da tastiera).
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+
+  /* -------------------------------------------------------------------------
+     ACCESSO CON CODICE PERSONALE
+     ------------------------------------------------------------------------- */
+
+  // Apre la schermata Liquid Glass che chiede il codice, personalizzata
+  // con il nome e l'iniziale dello studente appena scelto dal menu.
+  function openAccessScreen(nome) {
+    pendingStudent = nome;
+    accessTitle.textContent = "Ciao, " + nome;
+    accessAvatar.textContent = nome.charAt(0);
+    accessInput.value = "";
+    hideAccessError();
+    accessOverlay.setAttribute("data-open", "true");
+    window.setTimeout(() => accessInput.focus(), 350);
+  }
+
+  // Chiude la schermata senza entrare (pulsante "Annulla", Esc o
+  // click fuori dalla card) e azzera lo studente in attesa di codice.
+  function closeAccessScreen() {
+    accessOverlay.setAttribute("data-open", "false");
+    pendingStudent = null;
+  }
+
+  // Mostra il messaggio d'errore e fa "tremare" la card, come lo
+  // sblocco fallito su iOS. Il campo viene svuotato e rimesso a fuoco
+  // per permettere subito un nuovo tentativo.
+  function showAccessError() {
+    accessError.setAttribute("data-show", "true");
+    accessCard.classList.remove("shake");
+    void accessCard.offsetWidth; // riavvia l'animazione anche su errori consecutivi
+    accessCard.classList.add("shake");
+    accessInput.value = "";
+    accessInput.focus();
+  }
+
+  function hideAccessError() {
+    accessError.setAttribute("data-show", "false");
+    accessCard.classList.remove("shake");
+  }
+
+  // Invio del modulo: confronta il codice inserito con quello
+  // associato allo studente in CODICI_ACCESSO.
+  accessForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!pendingStudent) return;
+
+    const codiceInserito = accessInput.value.trim();
+    const codiceCorretto = CODICI_ACCESSO[pendingStudent];
+
+    if (codiceInserito && codiceInserito === codiceCorretto) {
+      hideAccessError();
+      // Segna, solo per questa scheda del browser, che questo nome ha
+      // superato la schermata del codice: profilo.html lo controlla
+      // per evitare che si possa aprire l'area personale direttamente
+      // dall'indirizzo, saltando il codice. Non è una vera misura di
+      // sicurezza (è aggirabile da chiunque sappia usare gli strumenti
+      // per sviluppatori), solo un filtro in più per l'uso normale.
+      sessionStorage.setItem("accessoNome", pendingStudent);
+      window.setTimeout(() => {
+        window.location.href = "./profilo.html?nome=" + encodeURIComponent(pendingStudent);
+      }, 200);
+    } else {
+      showAccessError();
+    }
+  });
+
+  accessCancel.addEventListener("click", closeAccessScreen);
+
+  // Click sullo sfondo scurito (fuori dalla card) -> chiude la schermata.
+  accessOverlay.addEventListener("mousedown", (e) => {
+    if (e.target === accessOverlay) closeAccessScreen();
+  });
+
+  // Tasto Esc -> chiude la schermata del codice, se aperta.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && accessOverlay.getAttribute("data-open") === "true") {
+      closeAccessScreen();
+    }
+  });
+
+  /* -------------------------------------------------------------------------
+     RENDER: ORARIO
+     ------------------------------------------------------------------------- */
+
+  // Costruisce dinamicamente intestazione e righe della tabella
+  // orario a partire dagli array GIORNI e ORARIO definiti sopra.
+  function renderTimetable() {
+    const head = document.getElementById("timetableHead");
+    head.innerHTML = "<th scope=\"col\">Ora</th>" +
+      GIORNI.map((g) => `<th scope="col">${g}</th>`).join("");
+
+    const body = document.getElementById("timetableBody");
+    body.innerHTML = ORARIO.map((riga) => {
+      const celle = riga.materie.map((m) => `<td>${m}</td>`).join("");
+      return `<tr><td>${riga.ora}</td>${celle}</tr>`;
+    }).join("");
+  }
+
+  /* -------------------------------------------------------------------------
+     INIT
+     ------------------------------------------------------------------------- */
+
+  renderStudents();
+  renderTimetable();
+</script>
+
+</body>
+</html>
