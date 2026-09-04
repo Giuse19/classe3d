@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3ª D — area della classe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     VARIABILI GLOBALI — identiche a index.html, per mantenere
+     coerenza visiva perfetta tra le pagine del progetto.
+     ========================================================= */
+  :root {
+    --bg-0: #050506;
+    --ink-0: #f5f5f7;
+    --ink-1: rgba(245,245,247,0.62);
+    --ink-2: rgba(245,245,247,0.38);
+    --hair: rgba(255,255,255,0.10);
+    --hair-strong: rgba(255,255,255,0.16);
+    --glass-fill: linear-gradient(155deg, rgba(255,255,255,0.09), rgba(255,255,255,0.02));
+    --glass-fill-soft: linear-gradient(155deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+    --accent: #8fb8ff;
+    --accent-soft: rgba(143,184,255,0.16);
+    --violet-soft: rgba(190,150,230,0.16);
+    --danger: #ffb4b4;
+    --shadow-ambient: 0 20px 60px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(ellipse 60% 45% at 18% 8%, rgba(110,140,210,0.10), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 85% 18%, rgba(150,110,200,0.07), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 50% 100%, rgba(70,90,150,0.09), transparent 60%),
+      var(--bg-0);
+    min-height: 100vh;
+    width: 100%;
+    color: var(--ink-0);
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-a {
+    width: 520px; height: 520px;
+    top: -140px; left: -120px;
+    background: radial-gradient(circle, rgba(120,150,230,0.16), transparent 70%);
+    animation: drift-a 26s ease-in-out infinite alternate;
+  }
+  .blob-b {
+    width: 480px; height: 480px;
+    bottom: -160px; right: -100px;
+    background: radial-gradient(circle, rgba(170,130,210,0.13), transparent 70%);
+    animation: drift-b 30s ease-in-out infinite alternate;
+  }
+  @keyframes drift-a { from { transform: translate(0,0); } to { transform: translate(60px, 40px); } }
+  @keyframes drift-b { from { transform: translate(0,0); } to { transform: translate(-50px, -30px); } }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* -------------------- topbar -------------------- */
+  .topbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 28px 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .topbar strong { color: var(--ink-1); font-weight: 600; }
+  .topbar .right { text-align: right; }
+
+  /* -------------------- intestazione personale -------------------- */
+  .profile-header {
+    position: relative;
+    z-index: 2;
+    max-width: 980px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 30px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: rise-in 0.55s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  .profile-who { display: flex; align-items: center; gap: 14px; }
+
+  .avatar-big {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #eaf1ff;
+    background: var(--glass-fill);
+    border: 1px solid var(--hair-strong);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+
+  .profile-greeting {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    margin: 0;
+    color: var(--ink-0);
+  }
+
+  .admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #dfe9ff;
+    background: rgba(143,184,255,0.16);
+    border: 1px solid rgba(143,184,255,0.32);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-top: 4px;
+  }
+
+  .ghost-btn {
+    appearance: none;
+    border: 1px solid var(--hair-strong);
+    background: rgba(255,255,255,0.04);
+    color: var(--ink-1);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 11px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease;
+  }
+  .ghost-btn:hover { background: rgba(255,255,255,0.09); color: var(--ink-0); transform: translateY(-1px); }
+  .ghost-btn:active { transform: translateY(0); }
+  .ghost-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* -------------------- tab bar -------------------- */
+  .tabbar-wrap {
+    position: relative;
+    z-index: 2;
+    max-width: 980px;
+    margin: 22px auto 0;
+    width: 100%;
+    padding: 0 24px;
+    animation: rise-in 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    animation-delay: 0.05s;
+  }
+
+  .tabbar {
+    display: inline-flex;
+    gap: 4px;
+    padding: 6px;
+    background: var(--glass-fill-soft);
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    backdrop-filter: blur(26px) saturate(170%);
+    -webkit-backdrop-filter: blur(26px) saturate(170%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .tab-btn:hover { color: var(--ink-0); }
+  .tab-btn[data-active="true"] {
+    background: var(--glass-fill);
+    color: var(--ink-0);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 6px 18px rgba(0,0,0,0.35);
+  }
+  .tab-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* -------------------- contenuto principale -------------------- */
+  main.content {
+    position: relative;
+    z-index: 2;
+    max-width: 980px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 22px 24px 50px;
+    flex: 1;
+  }
+
+  .panel { display: none; }
+  .panel[data-active="true"] { display: block; animation: rise-in 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+  .section-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    margin: 0 0 4px;
+    color: var(--ink-0);
+  }
+  .section-caption { font-size: 0.85rem; color: var(--ink-2); margin: 0 0 18px; }
+  .section-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  /* -------------------- card "in sintesi" (Home) -------------------- */
+  .glance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  .glance-card {
+    background: var(--glass-fill-soft);
+    border: 1px solid var(--hair);
+    border-radius: 22px;
+    padding: 20px;
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.08);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), border-color 0.3s ease;
+  }
+  .glance-card:hover { transform: translateY(-2px); border-color: var(--hair-strong); }
+
+  .glance-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--hair);
+    margin-bottom: 14px;
+    color: var(--ink-1);
+  }
+
+  .glance-label { font-size: 0.75rem; color: var(--ink-2); margin: 0 0 5px; }
+  .glance-value { font-size: 0.95rem; font-weight: 600; color: var(--ink-0); margin: 0; line-height: 1.4; }
+
+  /* -------------------- elenco elementi -------------------- */
+  .item-card {
+    background: var(--glass-fill-soft);
+    border: 1px solid var(--hair);
+    border-radius: 20px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .item-main { min-width: 0; }
+  .item-title { font-weight: 600; color: var(--ink-0); font-size: 0.95rem; margin: 0 0 4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .item-meta { font-size: 0.8rem; color: var(--ink-2); }
+  .item-meta .dot { margin: 0 6px; opacity: 0.6; }
+
+  .item-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    border: 1px solid var(--hair);
+    background: rgba(255,255,255,0.04);
+    color: var(--ink-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,0.1); color: var(--ink-0); }
+  .icon-btn.danger:hover { background: rgba(255,120,120,0.14); color: var(--danger); border-color: rgba(255,120,120,0.3); }
+  .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .link-btn {
+    appearance: none;
+    border: 1px solid var(--hair-strong);
+    background: rgba(255,255,255,0.05);
+    color: var(--ink-0);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .link-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+
+  .empty-state {
+    font-size: 0.86rem;
+    color: var(--ink-2);
+    padding: 24px 4px;
+    text-align: center;
+    border: 1px dashed var(--hair);
+    border-radius: 18px;
+  }
+
+  /* Etichetta tipo evento nel Calendario unico (Evento / Verifica / Interrogazione) */
+  .cal-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--hair-strong);
+    background: rgba(255,255,255,0.06);
+    color: var(--ink-1);
+  }
+  .cal-badge[data-tipo="Verifica"] { background: var(--accent-soft); border-color: rgba(143,184,255,0.32); color: #dfe9ff; }
+  .cal-badge[data-tipo="Interrogazione"] { background: var(--violet-soft); border-color: rgba(190,150,230,0.34); color: #ecdcfa; }
+
+  /* -------------------- pulsante "aggiungi" -------------------- */
+  .add-btn {
+    appearance: none;
+    border: 1px solid var(--hair-strong);
+    background: var(--glass-fill);
+    color: var(--ink-0);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    backdrop-filter: blur(20px) saturate(170%);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), background 0.3s ease;
+  }
+  .add-btn:hover { transform: translateY(-1px); background: linear-gradient(155deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04)); }
+  .add-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* -------------------- pannello modulo (aggiungi/modifica) -------------------- */
+  /* Stessa tecnica di apertura fluida usata per il menu "Seleziona
+     chi sei" in index.html: grid-template-rows da 0fr a 1fr. */
+  .form-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    margin-bottom: 6px;
+  }
+  .form-wrap[data-open="true"] { grid-template-rows: 1fr; }
+  .form-clip { overflow: hidden; min-height: 0; }
+
+  .form-card {
+    background: var(--glass-fill);
+    border: 1px solid var(--hair-strong);
+    border-radius: 22px;
+    padding: 20px;
+    margin-top: 6px;
+    backdrop-filter: blur(30px) saturate(170%);
+    -webkit-backdrop-filter: blur(30px) saturate(170%);
+    box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .form-title { font-size: 0.9rem; font-weight: 700; color: var(--ink-0); margin: 0 0 14px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field label { font-size: 0.74rem; color: var(--ink-2); }
+  .form-field input,
+  .form-field select {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid var(--hair-strong);
+    color: var(--ink-0);
+    font-family: inherit;
+    font-size: 0.88rem;
+    padding: 10px 12px;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .form-field input:focus,
+  .form-field select:focus {
+    border-color: rgba(143,184,255,0.5);
+    box-shadow: 0 0 0 3px rgba(143,184,255,0.12);
+  }
+  .form-field select option { background: #0e0e10; color: var(--ink-0); }
+  .form-hint { font-size: 0.72rem; color: var(--ink-2); margin: 6px 0 0; }
+
+  .form-actions { display: flex; gap: 10px; margin-top: 16px; }
+
+  .form-cancel {
+    background: none;
+    border: 1px solid var(--hair);
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.25s ease, border-color 0.25s ease;
+  }
+  .form-cancel:hover { color: var(--ink-0); border-color: var(--hair-strong); }
+
+  /* -------------------- footer -------------------- */
+  .footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 10px 24px 30px;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.28);
+  }
+
+  @media (max-width: 640px) {
+    .topbar { flex-direction: column; gap: 10px; padding: 22px 20px 0; }
+    .topbar .right { text-align: left; }
+    .profile-header { padding: 26px 18px 0; }
+    .tabbar-wrap { padding: 0 18px; }
+    main.content { padding: 18px 18px 40px; }
+    .glance-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .item-card { align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob-a, .blob-b { animation: none; }
+    .profile-header, .tabbar-wrap, .panel[data-active="true"] { animation: none; }
+    .form-wrap, .ghost-btn, .add-btn, .icon-btn, .glance-card { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="blob blob-a" aria-hidden="true"></div>
+  <div class="blob blob-b" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div>
+      Scuola Secondaria di Primo Grado<br />
+      <strong>Giuseppe Mazzini</strong>
+    </div>
+    <div class="right">
+      Noventa di Piave<br />
+      <strong>3ª D</strong>
+    </div>
+  </header>
+
+  <div class="profile-header">
+    <div class="profile-who">
+      <div class="avatar-big" id="avatarBig">?</div>
+      <div>
+        <h1 class="profile-greeting" id="heroTitle">Ciao</h1>
+        <span class="admin-badge" id="adminBadge" hidden>Amministratore</span>
+      </div>
+    </div>
+    <a class="ghost-btn" href="./index.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Cambia utente
+    </a>
+  </div>
+
+  <div class="tabbar-wrap">
+    <nav class="tabbar" id="tabbar">
+      <button type="button" class="tab-btn" data-tab="home">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path></svg>
+        Home
+      </button>
+      <button type="button" class="tab-btn" data-tab="calendario">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        Calendario
+      </button>
+      <button type="button" class="tab-btn" data-tab="materiale">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z"></path></svg>
+        Materiale
+      </button>
+      <button type="button" class="tab-btn" data-tab="chiavetta">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Chiavetta
+      </button>
+    </nav>
+  </div>
+
+  <main class="content">
+
+    <!-- ================= HOME ================= -->
+    <section class="panel" id="panel-home" data-tab-panel="home">
+      <p class="section-caption" style="margin-top:0;">La tua giornata a colpo d'occhio.</p>
+
+      <div class="glance-grid" id="glanceGrid"><!-- generato da JS --></div>
+
+      <h2 class="section-title">Prossimi impegni</h2>
+      <p class="section-caption">I prossimi eventi e verifiche del calendario della classe.</p>
+      <div id="homeProssimi"><!-- generato da JS --></div>
+    </section>
+
+    <!-- ================= CALENDARIO (eventi + verifiche + interrogazioni) ================= -->
+    <section class="panel" id="panel-calendario" data-tab-panel="calendario">
+      <div class="section-row">
+        <div>
+          <h2 class="section-title">Calendario</h2>
+          <p class="section-caption">Uscite, riunioni, verifiche e interrogazioni della classe, tutto in un unico posto.</p>
+        </div>
+        <button type="button" class="add-btn" id="btnAddCalendario" hidden>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Aggiungi al calendario
+        </button>
+      </div>
+
+      <div class="form-wrap" id="formWrapCalendario" data-open="false">
+        <div class="form-clip">
+          <div class="form-card">
+            <p class="form-title" id="formTitleCalendario">Nuovo elemento in calendario</p>
+            <form id="formCalendario">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="calTipo">Tipo</label>
+                  <select id="calTipo">
+                    <option>Evento</option>
+                    <option>Verifica</option>
+                    <option>Interrogazione</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label for="calData">Data</label>
+                  <input type="date" id="calData" required />
+                </div>
+                <div class="form-field full">
+                  <label for="calTitolo">Titolo / materia</label>
+                  <input type="text" id="calTitolo" required placeholder="Es. Uscita didattica, oppure Matematica" />
+                </div>
+                <div class="form-field full">
+                  <label for="calDettagli">Dettagli</label>
+                  <input type="text" id="calDettagli" placeholder="Luogo dell'evento, oppure argomento della verifica" />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="add-btn">Salva</button>
+                <button type="button" class="form-cancel" id="cancelCalendario">Annulla</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="listaCalendario"><!-- generato da JS --></div>
+    </section>
+
+    <!-- ================= MATERIALE SCOLASTICO ================= -->
+    <section class="panel" id="panel-materiale" data-tab-panel="materiale">
+      <div class="section-row">
+        <div>
+          <h2 class="section-title">Materiale scolastico</h2>
+          <p class="section-caption">Documenti, riassunti e link condivisi dagli insegnanti. Puoi consultarli e scaricarli.</p>
+        </div>
+        <button type="button" class="add-btn" id="btnAddMateriale" hidden>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Aggiungi materiale
+        </button>
+      </div>
+
+      <div class="form-wrap" id="formWrapMateriale" data-open="false">
+        <div class="form-clip">
+          <div class="form-card">
+            <p class="form-title" id="formTitleMateriale">Nuovo materiale</p>
+            <form id="formMateriale">
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label for="materialeTitolo">Titolo</label>
+                  <input type="text" id="materialeTitolo" required placeholder="Es. Riassunto capitolo 3" />
+                </div>
+                <div class="form-field">
+                  <label for="materialeMateria">Materia</label>
+                  <input type="text" id="materialeMateria" placeholder="Es. Scienze" />
+                </div>
+                <div class="form-field">
+                  <label for="materialeLink">Link al file</label>
+                  <input type="url" id="materialeLink" placeholder="https://..." />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="add-btn">Salva</button>
+                <button type="button" class="form-cancel" id="cancelMateriale">Annulla</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="listaMateriali"><!-- generato da JS --></div>
+    </section>
+
+    <!-- ================= CHIAVETTA (upload studenti) ================= -->
+    <section class="panel" id="panel-chiavetta" data-tab-panel="chiavetta">
+      <div class="section-row">
+        <div>
+          <h2 class="section-title">Chiavetta della classe</h2>
+          <p class="section-caption">Uno spazio comune: dopo l'accesso con il tuo codice puoi caricare un file per condividerlo con la classe. Tutti possono vedere e scaricare.</p>
+        </div>
+        <button type="button" class="add-btn" id="btnAddChiavetta">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Carica file
+        </button>
+      </div>
+
+      <div class="form-wrap" id="formWrapChiavetta" data-open="false">
+        <div class="form-clip">
+          <div class="form-card">
+            <p class="form-title">Carica un file</p>
+            <form id="formChiavetta">
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label for="chiavettaTitolo">Titolo (facoltativo)</label>
+                  <input type="text" id="chiavettaTitolo" placeholder="Es. Appunti di scienze" />
+                </div>
+                <div class="form-field full">
+                  <label for="chiavettaFile">File</label>
+                  <input type="file" id="chiavettaFile" required />
+                  <p class="form-hint">Dimensione massima 4 MB.</p>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="add-btn">Carica</button>
+                <button type="button" class="form-cancel" id="cancelChiavetta">Annulla</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="listaChiavetta"><!-- generato da JS --></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">Designed by Giuseppe</footer>
+
+<script>
+  /* =========================================================================
+     1. AUTENTICAZIONE (invariata rispetto a prima) — legge il nome
+        dall'URL, lo valida e controlla il "lasciapassare" salvato da
+        index.html dopo l'inserimento del codice personale corretto.
+        Il sistema di accesso di index.html non è stato toccato.
+     ========================================================================= */
+
+  const STUDENTI = [
+    "Alessandra", "Anastasia", "Anna", "Dajana", "Damiano", "Edoardo",
+    "Elenoire", "Enriko", "Giuseppe", "Hargun", "Khadija", "Mia",
+    "Nicolò", "Patric", "Pietro", "Sofia", "Tommaso", "Vitalina",
+  ];
+
+  // Chi ha i permessi di amministratore (calendario e materiale:
+  // aggiungi/modifica/elimina). Per aggiungerne un altro, basta
+  // scrivere il suo nome qui.
+  const ADMIN_STUDENTI = ["Giuseppe"];
+
+  const params = new URLSearchParams(window.location.search);
+  const nomeRicevuto = params.get("nome");
+
+  const nomeValido = STUDENTI.find(
+    (n) => n.toLowerCase() === (nomeRicevuto || "").toLowerCase()
+  );
+
+  const accessoOk = sessionStorage.getItem("accessoNome");
+
+  if (!nomeValido || accessoOk !== nomeValido) {
+    window.location.replace("./index.html");
+  }
+
+  const NOME_UTENTE = nomeValido;
+  const IS_ADMIN = ADMIN_STUDENTI.includes(NOME_UTENTE);
+
+  /* =========================================================================
+     2. LIVELLO DATI (DATA LAYER) — pensato per essere sostituito in futuro
+        con un vero database gratuito (es. Firebase, Supabase), senza dover
+        riscrivere l'interfaccia.
+
+        Oggi: i dati vivono nel localStorage del browser (persistono solo
+        su questo dispositivo/browser) e vengono inizializzati con dati di
+        esempio realistici al primo utilizzo.
+
+        Domani: basterà riscrivere le funzioni "caricaDati", "salvaDati",
+        "aggiungiElemento", "aggiornaElemento" ed "eliminaElemento" perché
+        parlino con un vero backend (es. fetch('/api/...')) invece che con
+        il localStorage. Il resto del codice (l'interfaccia) userà sempre
+        e solo queste funzioni, senza bisogno di essere riscritto.
+
+        NOTA sulla Chiavetta: i file vengono oggi salvati come "data URL"
+        (il contenuto del file convertito in testo) dentro al localStorage
+        del browser — comodo per una demo, ma con un limite di spazio di
+        pochi megabyte. Un vero database con uno spazio di archiviazione
+        dedicato (es. Firebase Storage, Supabase Storage) rimuoverà questo
+        limite senza cambiare l'interfaccia.
+     ========================================================================= */
+
+  const STORAGE_KEY = "classe3D_dati_v2";
+
+  // Dati di esempio, mostrati la primissima volta che si apre il sito
+  // (o dopo aver svuotato i dati del browser).
+  function datiIniziali() {
+    return {
+      calendario: [
+        { id: "c1", tipo: "Evento", titolo: "Uscita didattica al Vittoriale", data: "2026-10-12", dettagli: "Gardone Riviera" },
+        { id: "c2", tipo: "Evento", titolo: "Riunione scuola-famiglia", data: "2026-11-05", dettagli: "Aula magna" },
+        { id: "c3", tipo: "Verifica", titolo: "Matematica", data: "2026-09-15", dettagli: "Equazioni di primo grado" },
+        { id: "c4", tipo: "Interrogazione", titolo: "Inglese", data: "2026-09-18", dettagli: "Present perfect" },
+        { id: "c5", tipo: "Verifica", titolo: "Storia", data: "2026-09-22", dettagli: "La Prima Guerra Mondiale" },
+      ],
+      materiali: [
+        { id: "mt1", titolo: "Riassunto: la Prima Guerra Mondiale", materia: "Storia", link: "https://example.com/riassunto-storia.pdf", data: "2026-09-10" },
+        { id: "mt2", titolo: "Slide: Present Perfect", materia: "Inglese", link: "https://example.com/present-perfect.pdf", data: "2026-09-12" },
+        { id: "mt3", titolo: "Esercizi: Equazioni di primo grado", materia: "Matematica", link: "https://example.com/esercizi-equazioni.pdf", data: "2026-09-14" },
+      ],
+      chiavetta: [],
+    };
+  }
+
+  // Legge i dati salvati (oggi: localStorage — domani: chiamata al server).
+  function caricaDati() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (err) {
+      console.warn("Impossibile leggere i dati salvati, uso i dati di esempio.", err);
+    }
+    return datiIniziali();
+  }
+
+  // Scrive i dati (oggi: localStorage — domani: fetch POST/PUT verso l'API).
+  function salvaDati(dati) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dati));
+    } catch (err) {
+      alert("Spazio esaurito nel browser: non è stato possibile salvare. Con un vero database questo limite non ci sarà.");
+    }
+  }
+
+  let DATI = caricaDati();
+
+  // Genera un identificativo univoco semplice per i nuovi elementi.
+  // Un vero database assegnerebbe l'id automaticamente lato server.
+  function nuovoId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  // Funzioni generiche di aggiungi / aggiorna / elimina, valide per
+  // qualunque collezione (calendario, materiali, chiavetta). È qui che,
+  // in futuro, si collegherà il database al posto del localStorage.
+  function aggiungiElemento(collezione, elemento) {
+    elemento.id = nuovoId();
+    DATI[collezione].push(elemento);
+    salvaDati(DATI);
+  }
+  function aggiornaElemento(collezione, id, modifiche) {
+    const voce = DATI[collezione].find((x) => x.id === id);
+    if (voce) Object.assign(voce, modifiche);
+    salvaDati(DATI);
+  }
+  function eliminaElemento(collezione, id) {
+    DATI[collezione] = DATI[collezione].filter((x) => x.id !== id);
+    salvaDati(DATI);
+  }
+
+  /* =========================================================================
+     3. UTILITÀ
+     ========================================================================= */
+
+  function formattaData(isoDate) {
+    if (!isoDate) return "";
+    const d = new Date(isoDate + "T00:00:00");
+    if (isNaN(d.getTime())) return isoDate;
+    return d.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function ordinaPerData(lista) {
+    return [...lista].sort((a, b) => a.data.localeCompare(b.data));
+  }
+
+  // Frase leggibile per una voce di calendario: gli eventi mostrano il
+  // titolo così com'è, le verifiche/interrogazioni mostrano "Tipo di Materia".
+  function etichettaCalendario(item) {
+    return item.tipo === "Evento" ? item.titolo : item.tipo + " di " + item.titolo;
+  }
+
+  const iconEdit = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>`;
+  const iconTrash = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+
+  /* =========================================================================
+     4. TAB NAVIGATION
+     ========================================================================= */
+
+  const tabbar = document.getElementById("tabbar");
+  const pannelli = document.querySelectorAll(".panel");
+  const tabButtons = document.querySelectorAll(".tab-btn");
+
+  function attivaTab(nomeTab) {
+    tabButtons.forEach((btn) => btn.setAttribute("data-active", String(btn.dataset.tab === nomeTab)));
+    pannelli.forEach((p) => p.setAttribute("data-active", String(p.dataset.tabPanel === nomeTab)));
+  }
+
+  tabbar.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (btn) attivaTab(btn.dataset.tab);
+  });
+
+  /* =========================================================================
+     5. RENDER: HOME
+     ========================================================================= */
+
+  function renderHome() {
+    const oggi = new Date().toISOString().slice(0, 10);
+    const calendarioOrdinato = ordinaPerData(DATI.calendario);
+    const prossimo = calendarioOrdinato.find((c) => c.data >= oggi) || calendarioOrdinato[0];
+    const ultimoFileChiavetta = [...DATI.chiavetta].sort((a, b) => b.data.localeCompare(a.data))[0];
+
+    const glance = document.getElementById("glanceGrid");
+    glance.innerHTML = `
+      <button type="button" class="glance-card" data-tab="calendario">
+        <div class="glance-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+        <p class="glance-label">Prossimo impegno</p>
+        <p class="glance-value">${prossimo ? etichettaCalendario(prossimo) + " · " + formattaData(prossimo.data) : "Nessun impegno in programma"}</p>
+      </button>
+      <button type="button" class="glance-card" data-tab="materiale">
+        <div class="glance-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z"></path></svg></div>
+        <p class="glance-label">Materiale scolastico</p>
+        <p class="glance-value">${DATI.materiali.length} document${DATI.materiali.length === 1 ? "o" : "i"} disponibil${DATI.materiali.length === 1 ? "e" : "i"}</p>
+      </button>
+      <button type="button" class="glance-card" data-tab="chiavetta">
+        <div class="glance-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+        <p class="glance-label">Chiavetta della classe</p>
+        <p class="glance-value">${ultimoFileChiavetta ? "Ultimo file: " + ultimoFileChiavetta.titolo : "Nessun file caricato"}</p>
+      </button>
+    `;
+    glance.querySelectorAll(".glance-card").forEach((card) => {
+      card.addEventListener("click", () => attivaTab(card.dataset.tab));
+    });
+
+    const homeProssimi = document.getElementById("homeProssimi");
+    const prossimi = calendarioOrdinato.filter((c) => c.data >= oggi).slice(0, 3);
+    homeProssimi.innerHTML = prossimi.length
+      ? prossimi.map((c) => renderRigaCalendario(c, false)).join("")
+      : `<div class="empty-state">Nessun impegno in programma per ora.</div>`;
+  }
+
+  /* =========================================================================
+     6. RENDER + CRUD: CALENDARIO (eventi + verifiche + interrogazioni)
+     ========================================================================= */
+
+  const formWrapCalendario = document.getElementById("formWrapCalendario");
+  const formCalendario = document.getElementById("formCalendario");
+  let modificaCalendarioId = null;
+
+  function renderRigaCalendario(item, mostraAzioni) {
+    return `
+      <div class="item-card">
+        <div class="item-main">
+          <p class="item-title">
+            <span class="cal-badge" data-tipo="${item.tipo}">${item.tipo}</span>
+            ${item.tipo === "Evento" ? item.titolo : item.titolo}
+          </p>
+          <p class="item-meta">${formattaData(item.data)}${item.dettagli ? `<span class="dot">·</span>${item.dettagli}` : ""}</p>
+        </div>
+        ${mostraAzioni && IS_ADMIN ? `
+          <div class="item-actions">
+            <button type="button" class="icon-btn" data-action="edit-cal" data-id="${item.id}" aria-label="Modifica">${iconEdit}</button>
+            <button type="button" class="icon-btn danger" data-action="delete-cal" data-id="${item.id}" aria-label="Elimina">${iconTrash}</button>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  function renderCalendario() {
+    const lista = document.getElementById("listaCalendario");
+    const voci = ordinaPerData(DATI.calendario);
+    lista.innerHTML = voci.length
+      ? voci.map((v) => renderRigaCalendario(v, true)).join("")
+      : `<div class="empty-state">Il calendario è vuoto per ora.</div>`;
+  }
+
+  function apriFormCalendario(voce) {
+    modificaCalendarioId = voce ? voce.id : null;
+    document.getElementById("formTitleCalendario").textContent = voce ? "Modifica elemento" : "Nuovo elemento in calendario";
+    document.getElementById("calTipo").value = voce ? voce.tipo : "Evento";
+    document.getElementById("calTitolo").value = voce ? voce.titolo : "";
+    document.getElementById("calData").value = voce ? voce.data : "";
+    document.getElementById("calDettagli").value = voce ? voce.dettagli || "" : "";
+    formWrapCalendario.setAttribute("data-open", "true");
+  }
+  function chiudiFormCalendario() {
+    formWrapCalendario.setAttribute("data-open", "false");
+    formCalendario.reset();
+    modificaCalendarioId = null;
+  }
+
+  document.getElementById("btnAddCalendario").addEventListener("click", () => apriFormCalendario(null));
+  document.getElementById("cancelCalendario").addEventListener("click", chiudiFormCalendario);
+
+  formCalendario.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const dati = {
+      tipo: document.getElementById("calTipo").value,
+      titolo: document.getElementById("calTitolo").value.trim(),
+      data: document.getElementById("calData").value,
+      dettagli: document.getElementById("calDettagli").value.trim(),
+    };
+    if (!dati.titolo || !dati.data) return;
+
+    if (modificaCalendarioId) {
+      aggiornaElemento("calendario", modificaCalendarioId, dati);
+    } else {
+      aggiungiElemento("calendario", dati);
+    }
+    chiudiFormCalendario();
+    renderCalendario();
+    renderHome();
+  });
+
+  document.getElementById("listaCalendario").addEventListener("click", (e) => {
+    const btn = e.target.closest(".icon-btn");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit-cal") {
+      const voce = DATI.calendario.find((x) => x.id === id);
+      if (voce) apriFormCalendario(voce);
+    }
+    if (btn.dataset.action === "delete-cal") {
+      if (confirm("Eliminare questo elemento dal calendario?")) {
+        eliminaElemento("calendario", id);
+        renderCalendario();
+        renderHome();
+      }
+    }
+  });
+
+  /* =========================================================================
+     7. RENDER + CRUD: MATERIALE SCOLASTICO
+     ========================================================================= */
+
+  const formWrapMateriale = document.getElementById("formWrapMateriale");
+  const formMateriale = document.getElementById("formMateriale");
+  let modificaMaterialeId = null;
+
+  function renderMateriali() {
+    const lista = document.getElementById("listaMateriali");
+    const materiali = [...DATI.materiali].sort((a, b) => b.data.localeCompare(a.data));
+
+    lista.innerHTML = materiali.length
+      ? materiali.map((m) => `
+        <div class="item-card">
+          <div class="item-main">
+            <p class="item-title">${m.titolo}</p>
+            <p class="item-meta">${m.materia || "Materiale generale"}<span class="dot">·</span>${formattaData(m.data)}</p>
+          </div>
+          <div class="item-actions">
+            ${m.link ? `<a class="link-btn" href="${m.link}" target="_blank" rel="noopener">Scarica</a>` : ""}
+            ${IS_ADMIN ? `
+              <button type="button" class="icon-btn" data-action="edit-materiale" data-id="${m.id}" aria-label="Modifica materiale">${iconEdit}</button>
+              <button type="button" class="icon-btn danger" data-action="delete-materiale" data-id="${m.id}" aria-label="Elimina materiale">${iconTrash}</button>
+            ` : ""}
+          </div>
+        </div>
+      `).join("")
+      : `<div class="empty-state">Nessun materiale caricato per ora.</div>`;
+  }
+
+  function apriFormMateriale(materiale) {
+    modificaMaterialeId = materiale ? materiale.id : null;
+    document.getElementById("formTitleMateriale").textContent = materiale ? "Modifica materiale" : "Nuovo materiale";
+    document.getElementById("materialeTitolo").value = materiale ? materiale.titolo : "";
+    document.getElementById("materialeMateria").value = materiale ? materiale.materia || "" : "";
+    document.getElementById("materialeLink").value = materiale ? materiale.link || "" : "";
+    formWrapMateriale.setAttribute("data-open", "true");
+  }
+  function chiudiFormMateriale() {
+    formWrapMateriale.setAttribute("data-open", "false");
+    formMateriale.reset();
+    modificaMaterialeId = null;
+  }
+
+  document.getElementById("btnAddMateriale").addEventListener("click", () => apriFormMateriale(null));
+  document.getElementById("cancelMateriale").addEventListener("click", chiudiFormMateriale);
+
+  formMateriale.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const dati = {
+      titolo: document.getElementById("materialeTitolo").value.trim(),
+      materia: document.getElementById("materialeMateria").value.trim(),
+      link: document.getElementById("materialeLink").value.trim(),
+      data: modificaMaterialeId
+        ? (DATI.materiali.find((x) => x.id === modificaMaterialeId) || {}).data
+        : new Date().toISOString().slice(0, 10),
+    };
+    if (!dati.titolo) return;
+
+    if (modificaMaterialeId) {
+      aggiornaElemento("materiali", modificaMaterialeId, dati);
+    } else {
+      aggiungiElemento("materiali", dati);
+    }
+    chiudiFormMateriale();
+    renderMateriali();
+    renderHome();
+  });
+
+  document.getElementById("listaMateriali").addEventListener("click", (e) => {
+    const btn = e.target.closest(".icon-btn");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "edit-materiale") {
+      const materiale = DATI.materiali.find((x) => x.id === id);
+      if (materiale) apriFormMateriale(materiale);
+    }
+    if (btn.dataset.action === "delete-materiale") {
+      if (confirm("Eliminare questo materiale?")) {
+        eliminaElemento("materiali", id);
+        renderMateriali();
+        renderHome();
+      }
+    }
+  });
+
+  /* =========================================================================
+     8. RENDER + CARICAMENTO: CHIAVETTA DELLA CLASSE
+        Ogni studente autenticato può SOLO caricare un file (nessuna
+        modifica o eliminazione dei propri file). Solo l'amministratore
+        (Giuseppe) può eliminare o modificare i file presenti.
+     ========================================================================= */
+
+  const formWrapChiavetta = document.getElementById("formWrapChiavetta");
+  const formChiavetta = document.getElementById("formChiavetta");
+  const LIMITE_FILE_BYTE = 4 * 1024 * 1024; // 4 MB — limite del localStorage del browser
+
+  function renderChiavetta() {
+    const lista = document.getElementById("listaChiavetta");
+    const file = [...DATI.chiavetta].sort((a, b) => b.data.localeCompare(a.data));
+
+    lista.innerHTML = file.length
+      ? file.map((f) => `
+        <div class="item-card">
+          <div class="item-main">
+            <p class="item-title">${f.titolo}</p>
+            <p class="item-meta">Caricato da ${f.caricatoDa}<span class="dot">·</span>${formattaData(f.data)}</p>
+          </div>
+          <div class="item-actions">
+            <a class="link-btn" href="${f.dati}" download="${f.nomeFile || f.titolo}">Scarica</a>
+            ${IS_ADMIN ? `
+              <button type="button" class="icon-btn danger" data-action="delete-chiavetta" data-id="${f.id}" aria-label="Elimina file">${iconTrash}</button>
+            ` : ""}
+          </div>
+        </div>
+      `).join("")
+      : `<div class="empty-state">Nessun file caricato per ora.</div>`;
+  }
+
+  document.getElementById("btnAddChiavetta").addEventListener("click", () => {
+    formWrapChiavetta.setAttribute("data-open", "true");
+  });
+  document.getElementById("cancelChiavetta").addEventListener("click", () => {
+    formWrapChiavetta.setAttribute("data-open", "false");
+    formChiavetta.reset();
+  });
+
+  formChiavetta.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById("chiavettaFile");
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    if (file.size > LIMITE_FILE_BYTE) {
+      alert("Questo file è troppo grande per essere caricato qui (limite 4 MB). Con un vero database questo limite non ci sarà.");
+      return;
+    }
+
+    const titoloInserito = document.getElementById("chiavettaTitolo").value.trim();
+
+    // Il file viene convertito in una "data URL" e salvato nel
+    // localStorage: funziona bene per una demo con file piccoli.
+    // Con un vero database (storage dedicato) questo passaggio
+    // cambierà, ma l'interfaccia resterà identica.
+    const reader = new FileReader();
+    reader.onload = () => {
+      aggiungiElemento("chiavetta", {
+        titolo: titoloInserito || file.name,
+        nomeFile: file.name,
+        dati: reader.result,
+        caricatoDa: NOME_UTENTE,
+        data: new Date().toISOString().slice(0, 10),
+      });
+      formWrapChiavetta.setAttribute("data-open", "false");
+      formChiavetta.reset();
+      renderChiavetta();
+      renderHome();
+    };
+    reader.onerror = () => alert("Non è stato possibile leggere il file. Riprova.");
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("listaChiavetta").addEventListener("click", (e) => {
+    const btn = e.target.closest(".icon-btn");
+    if (!btn) return;
+    if (btn.dataset.action === "delete-chiavetta") {
+      if (confirm("Eliminare questo file dalla chiavetta della classe?")) {
+        eliminaElemento("chiavetta", btn.dataset.id);
+        renderChiavetta();
+        renderHome();
+      }
+    }
+  });
+
+  /* =========================================================================
+     9. INIZIALIZZAZIONE
+     ========================================================================= */
+
+  if (NOME_UTENTE) {
+    document.getElementById("heroTitle").textContent = "Ciao, " + NOME_UTENTE;
+    document.getElementById("avatarBig").textContent = NOME_UTENTE.charAt(0);
+    document.title = NOME_UTENTE + " — 3ª D";
+
+    if (IS_ADMIN) {
+      document.getElementById("adminBadge").hidden = false;
+      document.getElementById("btnAddCalendario").hidden = false;
+      document.getElementById("btnAddMateriale").hidden = false;
+    }
+
+    attivaTab("home");
+    renderHome();
+    renderCalendario();
+    renderMateriali();
+    renderChiavetta();
+  }
+</script>
+
+</body>
+</html>
